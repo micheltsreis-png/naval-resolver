@@ -213,7 +213,7 @@
   line-height: 1.75;
 }
 
-.resolucao-corpo h2 {
+.markdown h1, .markdown h2 {
   color: var(--navy);
   font-size: 1.05rem;
   margin: 16px 0 6px;
@@ -221,25 +221,62 @@
   padding-bottom: 4px;
 }
 
-.resolucao-corpo h3 {
+.markdown h3 {
   color: var(--navy-light);
   font-size: 0.95rem;
   margin: 12px 0 4px;
 }
 
-.resolucao-corpo p { margin: 4px 0; }
+.markdown p { margin: 6px 0; }
 
-.resolucao-corpo .passo {
+.markdown strong { color: var(--navy); }
+
+.markdown ul, .markdown ol {
+  padding-left: 20px;
+  margin: 8px 0;
+}
+
+.markdown li { margin: 4px 0; }
+
+.markdown blockquote {
   background: #f8fafc;
   border-left: 3px solid var(--navy);
   padding: 6px 12px;
   border-radius: 0 6px 6px 0;
-  margin: 6px 0;
+  margin: 8px 0;
+  color: #475569;
 }
 
-.resolucao-corpo .item { padding-left: 8px; }
+.markdown code {
+  background: #f1f5f9;
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-size: 0.9em;
+  color: var(--navy);
+}
 
-.resolucao-corpo strong { color: var(--navy); }
+.markdown pre {
+  background: #f1f5f9;
+  padding: 12px;
+  border-radius: 8px;
+  overflow-x: auto;
+}
+
+.markdown hr {
+  border: none;
+  border-top: 1px solid var(--border);
+  margin: 12px 0;
+}
+
+/* Fórmulas KaTeX */
+.markdown .katex-display {
+  margin: 12px 0;
+  overflow-x: auto;
+}
+
+.markdown .katex {
+  font-size: 1.05em;
+}
 
 /* Footer */
 .app-footer {
