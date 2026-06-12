@@ -1,0 +1,17 @@
+:root {
+  --navy: #0a2342;
+  --navy-light: #1a3a5c;
+  --gold: #c9a84c;
+  --border: #e2e8f0;
+  --sans: system-ui, 'Segoe UI', Roboto, sans-serif;
+
+  font: 16px/150% var(--sans);
+  color: #1e293b;
+  background: #f1f5f9;
+  -webkit-font-smoothing: antialiased;
+}
+
+* { box-sizing: border-box; }
+body { margin: 0; }
+#root { min-height: 100svh; }
+h1, h2, h3 { font-weight: 700; margin: 0; }
