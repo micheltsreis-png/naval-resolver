@@ -51,11 +51,14 @@ function App() {
           body: JSON.stringify({ texto }),
         })
       }
-      if (!res.ok) throw new Error('Erro no servidor')
+      if (!res.ok) {
+        const err = await res.json().catch(() => ({}))
+        throw new Error(err.detail || `Erro ${res.status}`)
+      }
       const data = await res.json()
       setResolucao(data.resolucao)
-    } catch {
-      setErro('Não foi possível conectar ao servidor. Verifique se o backend está rodando.')
+    } catch (err) {
+      setErro(err.message || 'Não foi possível conectar ao servidor.')
     } finally {
       setLoading(false)
     }

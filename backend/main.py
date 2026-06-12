@@ -10,8 +10,10 @@ app = FastAPI(title="Resolvedor Colégio Naval")
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],
-    allow_methods=["*"],
+    allow_methods=["GET", "POST", "OPTIONS"],
     allow_headers=["*"],
+    allow_credentials=False,
+    max_age=600,
 )
 
 client = Anthropic(api_key=os.environ["ANTHROPIC_API_KEY"])
