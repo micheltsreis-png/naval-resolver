@@ -28,6 +28,11 @@ Se for questão de múltipla escolha, indique qual alternativa está correta e e
 Se houver fórmulas, explique o que cada variável representa."""
 
 
+@app.get("/")
+async def health():
+    return {"status": "ok", "app": "Resolvedor Naval"}
+
+
 @app.post("/resolver")
 async def resolver(
     texto: str = Form(default=""),
