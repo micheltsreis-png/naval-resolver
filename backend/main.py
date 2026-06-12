@@ -2,6 +2,7 @@ import os
 import base64
 from fastapi import FastAPI, UploadFile, File, Form, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
+from pydantic import BaseModel
 from anthropic import Anthropic
 
 app = FastAPI(title="Resolvedor Colégio Naval")
@@ -28,49 +29,58 @@ Se for questão de múltipla escolha, indique qual alternativa está correta e e
 Se houver fórmulas, explique o que cada variável representa."""
 
 
+def chamar_claude(mensagens):
+    resposta = client.messages.create(
+        model="claude-sonnet-4-6",
+        max_tokens=2048,
+        system=SYSTEM_PROMPT,
+        messages=mensagens,
+    )
+    return resposta.content[0].text
+
+
 @app.get("/")
 async def health():
     return {"status": "ok", "app": "Resolvedor Naval"}
 
 
+class TextoRequest(BaseModel):
+    texto: str
+
+
 @app.post("/resolver")
-async def resolver(
-    texto: str = Form(default=""),
-    imagem: UploadFile = File(default=None),
-):
+async def resolver_texto(req: TextoRequest):
+    """Resolve questão enviada como texto (JSON)."""
+    if not req.texto.strip():
+        raise HTTPException(status_code=400, detail="Texto vazio.")
     try:
-        if not texto.strip() and (imagem is None or imagem.filename == ""):
-            raise HTTPException(status_code=400, detail="Envie texto ou imagem.")
+        resolucao = chamar_claude([{"role": "user", "content": req.texto.strip()}])
+        return {"resolucao": resolucao}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
 
-        mensagens = []
-        tem_imagem = imagem and imagem.filename
 
-        if tem_imagem:
-            conteudo_imagem = await imagem.read()
-            imagem_b64 = base64.standard_b64encode(conteudo_imagem).decode("utf-8")
-            media_type = imagem.content_type or "image/jpeg"
-            content = []
-            if texto.strip():
-                content.append({"type": "text", "text": texto})
-            content.append({
-                "type": "image",
-                "source": {"type": "base64", "media_type": media_type, "data": imagem_b64},
-            })
-            content.append({"type": "text", "text": "Resolva esta questão passo a passo."})
-            mensagens.append({"role": "user", "content": content})
-        else:
-            mensagens.append({"role": "user", "content": texto.strip()})
+@app.post("/resolver-imagem")
+async def resolver_imagem(
+    texto: str = Form(default=""),
+    imagem: UploadFile = File(...),
+):
+    """Resolve questão enviada como imagem (multipart)."""
+    try:
+        conteudo = await imagem.read()
+        imagem_b64 = base64.standard_b64encode(conteudo).decode("utf-8")
+        media_type = imagem.content_type or "image/jpeg"
 
-        resposta = client.messages.create(
-            model="claude-sonnet-4-6",
-            max_tokens=2048,
-            system=SYSTEM_PROMPT,
-            messages=mensagens,
-        )
+        content = []
+        if texto.strip():
+            content.append({"type": "text", "text": texto})
+        content.append({
+            "type": "image",
+            "source": {"type": "base64", "media_type": media_type, "data": imagem_b64},
+        })
+        content.append({"type": "text", "text": "Resolva esta questão passo a passo."})
 
-        return {"resolucao": resposta.content[0].text}
-
-    except HTTPException:
-        raise
+        resolucao = chamar_claude([{"role": "user", "content": content}])
+        return {"resolucao": resolucao}
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))

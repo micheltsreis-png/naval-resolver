@@ -35,10 +35,22 @@ function App() {
 
     const form = new FormData()
     if (texto.trim()) form.append('texto', texto)
-    if (imagem) form.append('imagem', imagem)
-
     try {
-      const res = await fetch(`${API_URL}/resolver`, { method: 'POST', body: form })
+      let res
+      if (imagem) {
+        // Envia como multipart com imagem
+        const form = new FormData()
+        if (texto.trim()) form.append('texto', texto)
+        form.append('imagem', imagem)
+        res = await fetch(`${API_URL}/resolver-imagem`, { method: 'POST', body: form })
+      } else {
+        // Envia como JSON apenas com texto
+        res = await fetch(`${API_URL}/resolver`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ texto }),
+        })
+      }
       if (!res.ok) throw new Error('Erro no servidor')
       const data = await res.json()
       setResolucao(data.resolucao)
